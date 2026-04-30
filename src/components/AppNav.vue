@@ -1,12 +1,25 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth.js'
 import AppIcon from './AppIcon.vue'
 
-const route = useRoute()
+const router = useRouter()
+const { isAuthenticated, currentUser, logout } = useAuth()
+
+const initials = computed(() => {
+  const email = currentUser.value?.email ?? ''
+  return email.slice(0, 2).toUpperCase()
+})
+
+function handleLogout() {
+  logout()
+  router.push('/login')
+}
 </script>
 
 <template>
-  <nav class="nav">
+  <nav class="nav" v-if="isAuthenticated">
     <div class="nav-left">
       <RouterLink to="/" class="logo">
         <div class="logo-mark">O</div>
@@ -23,7 +36,10 @@ const route = useRoute()
         <AppIcon name="plus" :size="14" :stroke="2" />
         New goal
       </RouterLink>
-      <div class="avatar">MK</div>
+      <button class="btn btn-quiet btn-sm" title="Sign out" @click="handleLogout">
+        <AppIcon name="x" :size="14" />
+      </button>
+      <div class="avatar">{{ initials }}</div>
     </div>
   </nav>
 </template>
